@@ -17,6 +17,7 @@ else if (!string.IsNullOrEmpty(errorMessage))
 }
 else if (imageClass is not null)
 {
+	<hr />
 	<table class="table">
 		<thead>
 			<tr>
@@ -39,14 +40,15 @@ else if (imageClass is not null)
 	private async Task OnFileSelected(InputFileChangeEventArgs e)
 	{
 		var file = e.File;
+		const long maxSize = 2L * 1024 * 1024;
+
 		if (file == null)
 		{
 			errorMessage = "No file selected.";
 			return;
 		}
 
-		const long maxBytes = 2L * 1024 * 1024;
-		if (file.Size > maxBytes)
+		if (file.Size > maxSize)
 		{
 			errorMessage = "File is too large. Max allowed size is 2 MB.";
 			return;
@@ -55,7 +57,7 @@ else if (imageClass is not null)
 		isProcessing = true;
 		errorMessage = null;
 
-		await using var stream = file.OpenReadStream();
+		await using var stream = file.OpenReadStream(maxAllowedSize: maxSize);
 
 		await using var memoryStream = new MemoryStream();
 		await stream.CopyToAsync(memoryStream);
