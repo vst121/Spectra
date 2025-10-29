@@ -2,13 +2,12 @@
 
 public class ImageProcessingInstance
 {
-    public static void RunImageProcessing()
+    public static Task<string> RunImageProcessing(Stream selectedImage)
     {
-        var prjPath = "D:\\DotNetProjects10\\Spectra\\Spectra.ImageProcessing\\Models\\";
+        var prjModelPath = "D:\\DotNetProjects10\\Spectra\\Spectra.ImageProcessing\\Models\\";
 
-        var session = new InferenceSession(prjPath + "mobilenetv2-10.onnx");
-        string imagePath = prjPath + "ButterflyFish.jpg";
-        var inputTensor = PreprocessImage(imagePath);
+        var session = new InferenceSession(prjModelPath + "mobilenetv2-10.onnx");
+        var inputTensor = PreprocessImage(selectedImage);
 
         var inputName = session.InputMetadata.Keys.First();
         var inputs = new List<NamedOnnxValue>
@@ -17,22 +16,22 @@ public class ImageProcessingInstance
         };
 
         using var results = session.Run(inputs);
-        var output = results.First().AsEnumerable<float>().ToArray();
+        var output = results[0].AsEnumerable<float>().ToArray();
 
         int topIndex = Array.IndexOf(output, output.Max());
 
-        string[] labels = File.ReadAllLines(prjPath + "synset.txt");
+        string[] labels = File.ReadAllLines(prjModelPath + "synset.txt");
         string predictedLabel = labels.Length > topIndex ? labels[topIndex] : "Unknown";
 
-        Console.WriteLine($"Predicted class: {predictedLabel}");
+        return Task.FromResult(predictedLabel);
     }
 
-    static DenseTensor<float> PreprocessImage(string imagePath)
+    static DenseTensor<float> PreprocessImage(Stream selectedImage)
     {
-        using var image = Image.Load<Rgb24>(imagePath);
+        using var image = Image.Load<Rgb24>(selectedImage);
         image.Mutate(x => x.Resize(224, 224));
 
-        var input = new DenseTensor<float>(new[] { 1, 3, 224, 224 });
+        var input = new DenseTensor<float>([1, 3, 224, 224]);
 
         for (int y = 0; y < 224; y++)
         {

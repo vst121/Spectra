@@ -1,0 +1,69 @@
+﻿@page "/imageclass"
+@rendermode InteractiveServer
+
+<PageTitle>Image Class</PageTitle>
+
+<p>Select an image file from your computer.</p>
+
+<InputFile OnChange="OnFileSelected" accept="image/*" />
+
+@if (isProcessing)
+{
+	<p><em>Processing...</em></p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+	<div class="alert alert-danger">@errorMessage</div>
+}
+else if (imageClass is not null)
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Image Class</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>@imageClass</td>
+			</tr>
+		</tbody>
+	</table>
+}
+
+@code {
+	private string? imageClass;
+	private bool isProcessing = false;
+	private string? errorMessage;
+
+	private async Task OnFileSelected(InputFileChangeEventArgs e)
+	{
+		var file = e.File;
+		if (file == null)
+		{
+			errorMessage = "No file selected.";
+			return;
+		}
+
+		const long maxBytes = 2L * 1024 * 1024;
+		if (file.Size > maxBytes)
+		{
+			errorMessage = "File is too large. Max allowed size is 2 MB.";
+			return;
+		}
+
+		isProcessing = true;
+		errorMessage = null;
+
+		await using var stream = file.OpenReadStream();
+
+		await using var memoryStream = new MemoryStream();
+		await stream.CopyToAsync(memoryStream);
+		memoryStream.Position = 0;
+
+		imageClass = await ImageProcessingInstance.RunImageProcessing(memoryStream);
+
+		isProcessing = false;
+
+	}
+}
