@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally> 
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.ML" />
+		<PackageReference Include="Microsoft.ML.ImageAnalytics" />
+		<PackageReference Include="Microsoft.ML.OnnxRuntime" />
+		<PackageReference Include="SixLabors.ImageSharp" />
+	</ItemGroup>
+
+</Project>
