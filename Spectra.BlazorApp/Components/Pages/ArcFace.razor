@@ -1,0 +1,71 @@
+﻿@page "/arcface"
+@rendermode InteractiveServer
+
+<PageTitle>Arc Face</PageTitle>
+
+<p>Select an image file from your computer.</p>
+
+<InputFile OnChange="OnFileSelected" accept="image/*" />
+
+@if (isProcessing)
+{
+	<p><em>Processing...</em></p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+	<div class="alert alert-danger">@errorMessage</div>
+}
+else if (arcFace is not null)
+{
+	<hr />
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Arc Face</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>@arcFace</td>
+			</tr>
+		</tbody>
+	</table>
+}
+
+@code {
+	private string? arcFace;
+	private bool isProcessing = false;
+	private string? errorMessage;
+
+	private async Task OnFileSelected(InputFileChangeEventArgs e)
+	{
+		var file = e.File;
+		const long maxSize = 2L * 1024 * 1024;
+
+		if (file == null)
+		{
+			errorMessage = "No file selected.";
+			return;
+		}
+
+		if (file.Size > maxSize)
+		{
+			errorMessage = "File is too large. Max allowed size is 2 MB.";
+			return;
+		}
+
+		isProcessing = true;
+		errorMessage = null;
+
+		await using var stream = file.OpenReadStream(maxAllowedSize: maxSize);
+
+		await using var memoryStream = new MemoryStream();
+		await stream.CopyToAsync(memoryStream);
+		memoryStream.Position = 0;
+
+		arcFace = await ImageProcessingInstance.RunImageProcessing(memoryStream);
+
+		isProcessing = false;
+
+	}
+}
