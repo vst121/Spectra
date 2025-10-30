@@ -1,17 +1,19 @@
 ﻿@page "/arcface"
+@using Spectra.ImageProcessing.Processing
 @rendermode InteractiveServer
 
 <PageTitle>Arc Face</PageTitle>
 
-<p>Select an image file from your computer.</p>
+<p>Select two image files from your computer.</p>
 
-<InputFile OnChange="OnFileSelected" accept="image/*" />
+<InputFile OnChange="OnFile1Selected" accept="image/*" />
+<br />
+<InputFile OnChange="OnFile2Selected" accept="image/*" />
+<hr />
+<input type="button" @onclick="CheckSimilarity" value="Check Similiarity" />
 
-@if (isProcessing)
-{
-	<p><em>Processing...</em></p>
-}
-else if (!string.IsNullOrEmpty(errorMessage))
+
+@if (!string.IsNullOrEmpty(errorMessage))
 {
 	<div class="alert alert-danger">@errorMessage</div>
 }
@@ -21,7 +23,7 @@ else if (arcFace is not null)
 	<table class="table">
 		<thead>
 			<tr>
-				<th>Arc Face</th>
+				<th>Similarity</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -34,10 +36,10 @@ else if (arcFace is not null)
 
 @code {
 	private string? arcFace;
-	private bool isProcessing = false;
 	private string? errorMessage;
+	private MemoryStream image1MemoryStream, image2MemoryStream;
 
-	private async Task OnFileSelected(InputFileChangeEventArgs e)
+	private async Task OnFile1Selected(InputFileChangeEventArgs e)
 	{
 		var file = e.File;
 		const long maxSize = 2L * 1024 * 1024;
@@ -54,18 +56,50 @@ else if (arcFace is not null)
 			return;
 		}
 
-		isProcessing = true;
 		errorMessage = null;
 
 		await using var stream = file.OpenReadStream(maxAllowedSize: maxSize);
 
-		await using var memoryStream = new MemoryStream();
-		await stream.CopyToAsync(memoryStream);
-		memoryStream.Position = 0;
+		image1MemoryStream = new MemoryStream();
+		await stream.CopyToAsync(image1MemoryStream);
+		image1MemoryStream.Position = 0;
+	}
 
-		arcFace = await ImageProcessingInstance.RunImageProcessing(memoryStream);
+	private async Task OnFile2Selected(InputFileChangeEventArgs e)
+	{
+		var file = e.File;
+		const long maxSize = 2L * 1024 * 1024;
 
-		isProcessing = false;
+		if (file == null)
+		{
+			errorMessage = "No file selected.";
+			return;
+		}
 
+		if (file.Size > maxSize)
+		{
+			errorMessage = "File is too large. Max allowed size is 2 MB.";
+			return;
+		}
+
+		errorMessage = null;
+
+		await using var stream = file.OpenReadStream(maxAllowedSize: maxSize);
+
+		image2MemoryStream = new MemoryStream();
+		await stream.CopyToAsync(image2MemoryStream);
+		image2MemoryStream.Position = 0;
+	}
+
+	private async Task CheckSimilarity()
+	{
+
+		var arcFaceService = new ArcFaceService();
+		var result1 = await arcFaceService.GetEmbedding(image1MemoryStream);
+		var result2 = await arcFaceService.GetEmbedding(image2MemoryStream);
+
+		var sim = await ArcFaceService.CosineSimilarity(result1, result2);
+
+		arcFace = sim.ToString();
 	}
 }

@@ -1,4 +1,5 @@
 ﻿@page "/agegender"
+@using Spectra.ImageProcessing.Processing
 @rendermode InteractiveServer
 
 <PageTitle>Age Gender</PageTitle>
@@ -63,7 +64,7 @@ else if (ageGender is not null)
 		await stream.CopyToAsync(memoryStream);
 		memoryStream.Position = 0;
 
-		ageGender = await ImageProcessingInstance.RunImageProcessing(memoryStream);
+		ageGender = await ClassificationService.DoClassification(memoryStream);
 
 		isProcessing = false;
 

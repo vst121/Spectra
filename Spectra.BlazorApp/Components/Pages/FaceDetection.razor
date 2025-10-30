@@ -63,7 +63,7 @@ else if (faceDetection is not null)
 		await stream.CopyToAsync(memoryStream);
 		memoryStream.Position = 0;
 
-		faceDetection = await ImageProcessingInstance.RunImageProcessing(memoryStream);
+		faceDetection = await ClassificationService.DoClassification(memoryStream);
 
 		isProcessing = false;
 
