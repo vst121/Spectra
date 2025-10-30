@@ -16,27 +16,31 @@ else if (!string.IsNullOrEmpty(errorMessage))
 {
 	<div class="alert alert-danger">@errorMessage</div>
 }
-else if (ageGender is not null)
+else if (predictedAge != float.MinValue)
 {
 	<hr />
 	<table class="table">
 		<thead>
 			<tr>
-				<th>Age Gender</th>
+				<th>Age</th>
+				<th>Gender</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
-				<td>@ageGender</td>
+				<td>@predictedAge</td>
+				<td>@predictedGender (@predictedGenderConfidence:P1)</td>
 			</tr>
 		</tbody>
 	</table>
 }
 
 @code {
-	private string? ageGender;
 	private bool isProcessing = false;
 	private string? errorMessage;
+	private float predictedAge = float.MinValue;
+	private string predictedGender = "-";
+	private float predictedGenderConfidence = 0f;
 
 	private async Task OnFileSelected(InputFileChangeEventArgs e)
 	{
@@ -64,7 +68,12 @@ else if (ageGender is not null)
 		await stream.CopyToAsync(memoryStream);
 		memoryStream.Position = 0;
 
-		ageGender = await ClassificationService.DoClassification(memoryStream);
+		// call service to predict
+		var ageGenderService = new AgeGenderService();
+		var (age, gender, genderConf) = ageGenderService.PredictAgeGender(memoryStream);
+		predictedAge = age;
+		predictedGender = gender;
+		predictedGenderConfidence = genderConf;
 
 		isProcessing = false;
 
