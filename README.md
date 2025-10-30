@@ -1,4 +1,4 @@
-**Spectra** is a web app for working with image processing models. In this proejct, I try use different ready models in this C# project.
+**Spectra** is a web app for working with image processing models. In this proejct, I try use different ready models and show the results in a simple Blazor app.
 
 **ONNX Models**: 
 
