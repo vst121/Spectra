@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="TestImages\**" />
+    <Content Remove="TestImages\**" />
+    <EmbeddedResource Remove="TestImages\**" />
+    <None Remove="TestImages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Spectra.ImageProcessing\Spectra.ImageProcessing.csproj" />
   </ItemGroup>
 
