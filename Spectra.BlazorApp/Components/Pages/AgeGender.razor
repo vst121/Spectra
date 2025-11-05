@@ -16,7 +16,7 @@ else if (!string.IsNullOrEmpty(errorMessage))
 {
 	<div class="alert alert-danger">@errorMessage</div>
 }
-else if (predictedAge != float.MinValue)
+else if (predictedAge != "")
 {
 	<hr />
 	<table class="table">
@@ -38,7 +38,7 @@ else if (predictedAge != float.MinValue)
 @code {
 	private bool isProcessing = false;
 	private string? errorMessage;
-	private float predictedAge = float.MinValue;
+	private string predictedAge = "";
 	private string predictedGender = "-";
 	private float predictedGenderConfidence = 0f;
 
@@ -66,16 +66,15 @@ else if (predictedAge != float.MinValue)
 
 		await using var memoryStream = new MemoryStream();
 		await stream.CopyToAsync(memoryStream);
-		memoryStream.Position = 0;
 
-		// call service to predict
+		memoryStream.Position = 0;
 		var ageGenderService = new AgeGenderService();
 		var (age, gender, genderConf) = ageGenderService.PredictAgeGender(memoryStream);
+
 		predictedAge = age;
 		predictedGender = gender;
 		predictedGenderConfidence = genderConf;
 
 		isProcessing = false;
-
 	}
 }

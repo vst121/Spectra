@@ -1,8 +1,11 @@
 <Project>
-  <ItemGroup>
-    <GlobalPackageReference Include="Microsoft.ML" Version="4.0.2" />
-    <GlobalPackageReference Include="Microsoft.ML.ImageAnalytics" Version="4.0.2" />
-    <GlobalPackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.2" />
-	<GlobalPackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
-  </ItemGroup>
+	<ItemGroup>
+		<GlobalPackageReference Include="Microsoft.ML" Version="4.0.2" />
+		<GlobalPackageReference Include="Microsoft.ML.ImageAnalytics" Version="4.0.2" />
+		<GlobalPackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.2" />
+		<GlobalPackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+		<GlobalPackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
+		<GlobalPackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
+		<GlobalPackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
+	</ItemGroup>
 </Project>

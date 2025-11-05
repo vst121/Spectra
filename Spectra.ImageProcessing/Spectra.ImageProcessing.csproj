@@ -12,6 +12,8 @@
 		<PackageReference Include="Microsoft.ML.ImageAnalytics" />
 		<PackageReference Include="Microsoft.ML.OnnxRuntime" />
 		<PackageReference Include="SixLabors.ImageSharp" />
+		<PackageReference Include="OpenCvSharp4" />
+		<PackageReference Include="OpenCvSharp4.runtime.win" />
 	</ItemGroup>
 
 </Project>
